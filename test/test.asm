@@ -1,0 +1,438 @@
+jp 0x0100
+
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+
+;0x10 : 0xFF
+;0x11 : 0xEE
+;0x12 : 0x42
+;0x13 : 0xAB
+;0x14 : 0xFF (0x10)
+;0x15 : 0x69
+;0x16 : 0x12
+;0x17 : 0x34
+
+;0x18 : 0x36
+;0x19 : 0x39
+;0x1A : 0x12 (0x16)
+;0x1B : 0x69 (0x15)
+;0x1C : 0x14
+;0x1D : 0x20
+;0x1E : 0x21
+;0x1F : 0x78
+
+;0x20 : 0x56
+;0x21 : 0x57
+;0x22 : 0x13
+;0x23 : 0x68
+;0x24 : 0x24
+;0x25 : 0x35
+;0x26 : 0x52
+;0x27 : 0x35
+
+;0x28 : 0x52
+;0x29 : 0x93
+;0x2A : 0x52
+;0x2B : 0x89
+;0x2C : 0x67
+;0x2D : 0x44
+;0x2E : 0x63
+;0x2F : 0x53
+
+;0x30 : 0xF1
+;0x31 : 0xA8
+;0x32 : 0xEF
+;0x33 : 0xBE
+;0x34 : 0xBE (0xFFFD)
+;0x35 : 0xFE
+;0x36 : 0xFF
+;0x37 : 0x35
+
+;0x38 : 0x00
+;0x39 : 0x01
+;0x3A : 0x00
+
+;0x0000 - 0x0010: initial jump & constants
+;0x0010 - 0x0050: Write results here to assert
+;0x0100 - 0x0500: code
+;0x0500 - 0x0800: Currently unused
+;0x0800 - 0xFF00: stack
+;0xFF01 - 0xFFFF: More constants, fill from 0xFFFF down to 0xFF01. Values used:
+                        ;0xFFFF
+                        ;0xFFFE
+                        ;0xFFFD
+
+;load section;
+
+ld a, 0xFF
+ld b, a
+
+ld h, 0x00
+ld l, 0x10
+ld (hl), b
+ld l, 0x11
+ld (hl), 0xEE
+
+ld d, 0x42
+ld (IX + 0x12), d
+ld (IY + 0x13), 0xAB
+
+ld b, 0
+ld c, 0x10
+ld a, (bc)
+ld l, 0x14
+ld (hl), a
+
+ld d, 0
+ld e, 0x15
+ld a, 0x69
+ld (de), a
+
+ld hl, 0x1234
+ld (IX + 0x16), h
+ld (IX + 0x17), l
+
+ld IX, 0x0018
+ld IY, 0x0019
+ld a, 0x36
+ld b, 0x39
+ld (IX + 0), a
+ld (IY + 0), b
+
+ld hl, (0x15)
+ld IX, 0x0
+ld (IX + 0x1A), h
+ld (IX + 0x1B), l
+
+ld a, 0x20
+ld (IX + 0x0E), a
+ld a, 0x14
+ld (IX + 0x0F), a
+ld de, (0x000E)
+ld (IX + 0x1C), d
+ld (IX + 0x1D), e
+
+ld d, 0xFF
+ld e, 0xFE
+ld a, 0x1E
+ld (de), a
+
+ld e, 0xFF
+ld a, 0x00
+ld (de), a
+
+ld IX, (0xFFFE)
+ld a, 0x21
+ld (IX + 0x00), a
+
+ld hl, 0x5678
+ld d, 0x13
+ld e, 0x57
+ld IX, 0x2468
+ld (0x1F), HL
+ld (0x21), DE
+ld (0x23), IX
+
+ld hl, 0x2486
+ld IX, 0xFF00
+ld SP, HL
+ld SP, IX
+
+ld hl, 0x0027
+ld SP, hl
+ld hl, 0x5235
+push hl
+pop bc
+ld hl, 0xFF00
+ld sp, hl
+ld (0x27), bc
+
+ld hl, 0x5293
+ld de, 0x6789
+ex de, hl
+ld (0x29), de
+ld (0x2B), hl
+
+ld a, 0x44
+ex af, af'
+ld a, 0x36
+ex af, af'
+ld (0x2D), a
+
+ld bc, 0x5363
+exx
+ld bc, 0x8319
+exx
+ld (0x2E), bc
+
+ld de, 0xA8F1
+push de
+ld hl, 0xBEEF
+ex (sp), hl
+pop de
+ld (0x30), hl
+ld (0x32), de
+
+ld a, 0xBE
+ld (0xFFFD), a
+ld hl, 0xFFFD
+ld de, 0x0034
+ld bc, 0x0002
+ldi
+ld (0x35), hl
+ld (0x37), de
+ld (0x39), bc
+
+halt
