@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <fstream>
 #include <string.h>
 #include <iostream>
@@ -7,33 +6,32 @@
 #include <limits>
 #include <vector>
 #include <algorithm>
+#include <iomanip>
 #include "regs.h"
 #include "main.h"
 #include "stringlib.h"
 
-using namespace std;
-
 void executeDebugCommand(std::string arg);
 
-void usage(char * name) {
-    printf("Usage: %s <hexfile> [-d] [-q] [-s]\n", name);
-    printf("Options:\n");
-    printf("    -s   --step       Enable single-step debug mode\n");
-    printf("    -e X --execute X  Run this debug command (\"X\") every instruction executed\n");
-    printf("    -f <file>         Run the contents of <file> as if it was passed through -e\n");
+void usage(std::string name) {
+    std::cout << "Usage: " << name << " <hexfile> [-d] [-q] [-s]\n";
+    std::cout << "Options:\n";
+    std::cout << "    -s   --step       Enable single-step debug mode\n";
+    std::cout << "    -e X --execute X  Run this debug command (\"X\") every instruction executed\n";
+    std::cout << "    -f <file>         Run the contents of <file> as if it was passed through -e\n";
 }
 
-char * parseArgs(int argc, char ** argv) {
-    char * fname = NULL;
+std::string parseArgs(int argc, char ** argv) {
+    std::string fname = "";
     if (argc < 2) {
-        usage(argv[0]);
-        return NULL;
+        usage(std::string(argv[0]));
+        return "";
     }
     
     int opt;
     opterr = 0;
     
-    while ( (opt = getopt(argc, argv, "se:f:")) != -1) {
+    while ((opt = getopt(argc, argv, "se:f:")) != -1) {
         switch (opt) {
             case 's':
                 step = true;
@@ -42,18 +40,18 @@ char * parseArgs(int argc, char ** argv) {
             case 'e':
                 eachTimeCommand = std::string(optarg);
                 debug = true;
-                cout << eachTimeCommand << "\n";
+                std::cout << eachTimeCommand << "\n";
                 break;
                 
             case 'f': {
                 debug = true;
-                char * dfname = optarg;
-                ifstream inFile;
-                inFile.open(dfname, ios::in);
+                std::string dfname = std::string(optarg);
+                std::ifstream inFile;
+                inFile.open(dfname, std::ios::in);
     
                 if (!inFile.is_open()) {
-                    printf("Error opening debug script file '%s'\n", dfname);
-                    return NULL;
+                    std::cout << "Error opening debug script file '" << dfname << "'\n";
+                    return "";
                 }
                 
                 for (std::string line; getline(inFile, line);) {
@@ -65,68 +63,70 @@ char * parseArgs(int argc, char ** argv) {
                 
             case ':':
             case '?':
-                cerr << "Error: unknown option '" << char(opt) << "'\n";
-                usage(argv[0]);
-                return NULL;
+                std::cerr << "Error: unknown option '" << (char)opt << "'\n";
+                usage(std::string(argv[0]));
+                return "";
         }
     }
     
     if (optind < argc) {
         do {
-            if (fname != 0) {
-                cerr << "Error: expected exactly one filename\n";
-                usage(argv[0]);
-                return NULL;
+            if (fname != "") {
+                std::cerr << "Error: expected exactly one filename\n";
+                usage(std::string(argv[0]));
+                return "";
             }
-            fname = argv[optind];
+            fname = std::string(argv[optind]);
         } while (++optind < argc);
     } else {
-        printf("Error: expected file\n");
-        usage(argv[0]);
-        return NULL;
+        std::cerr << "Error: expected file\n";
+        usage(std::string(argv[0]));
+        return "";
     }
     return fname;
 }
 
-int readFile(char * fname) {
-    ifstream inFile;
-    ifstream::pos_type size;
-    inFile.open(fname, ios::in | ios::binary | ios::ate);
+int readFile(std::string fname) {
+    std::ifstream inFile;
+    std::ifstream::pos_type size;
+    inFile.open(fname, std::ios::in | std::ios::binary | std::ios::ate);
     
     if (!inFile.is_open()) {
-        printf("Error opening file '%s'\n", fname);
+        std::cerr << "Error opening file '"<< fname << "'\n";
         return 1;
     }
     
     size = inFile.tellg();
 
     if (size > 65536) {
-        printf("Memory file too large (>65536)\n");
+        std::cerr << "Memory file too large (>65536)\n";
         return 1;
     }
-    char * buffer = new char[size];
-    
-    inFile.seekg(0, ios::beg);
-    inFile.read(buffer, size);
+        
+    inFile.seekg(0, std::ios::beg);
+    inFile.read((char*)mem, size);
     
     inFile.close();
     
-    for (int i = 0; i < size; i++) {
-        mem[i] = buffer[i];
-    }
     return 0;
 }
 
 void stepPrompt() {
     std::string command;
     while (command != "a" && command != "advance") {
-        printf(">> ");
+        std::cout << ">> ";
         std::getline(std::cin, command);
         executeDebugCommand(command);
     }
 }
 
-void executeDebugCommand(string total) {
+std::string hex(uint32_t num) {
+    std::stringstream ss;
+    ss << std::hex << std::setw(2) << std::setfill('0') << num;
+    return ss.str();
+}
+
+void executeDebugCommand(std::string total) {
     std::vector<std::string> lines = split(total, ';');
     for (unsigned int line = 0; line < lines.size(); line++) {
         std::string text = lines.at(line);
@@ -143,7 +143,7 @@ void executeDebugCommand(string total) {
             print_regs();
         } else if (command == "mem") {
             if (argc < 2) {
-                cerr << "'mem' debug command takes two arguments: start address and end address (hex)\n";
+                std::cerr << "'mem' debug command takes two arguments: start address and end address (hex)\n";
             }
             unsigned int startAddr = 0;
             unsigned int endAddr = 0;
@@ -157,40 +157,40 @@ void executeDebugCommand(string total) {
 
             for (unsigned int i = startAddr; i < endAddr; i += 8)  {
                 for (int j = 0; j < 8 && i + j < endAddr; j++) {
-                    printf("0x%02x ", mem[i + j]);
+                    std::cout << hex(mem[i + j]) << " ";
                 }
-                printf("\n");
+                std::cout << "\n";
             }
         } else if (command == "instr") {
-            printf("Next instr: 0x%02x\n", mem[pc]);
+            std::cout << "Next instr: 0x" << std::hex << (int)mem[pc] << "\n";
         } else if (command == "lastinstr") {
             if (pc > 0) {
-                printf("Last instr: 0x%02x\n", lastInstr);
+                std::cout << "Last instr: 0x" << std::hex << (int)lastInstr << "\n";
             } else {
-                printf("PC is 0: no last instruction\n");
+                std::cout << "PC is 0: no last instruction\n";
             }
         } else if (command == "print") {
             for (int i = 0; i < argc; i++) {
-                cout << args[i];
+                std::cout << args[i];
             }
-            cout << endl;
+            std::cout << "\n";
         } else if (command == "help") {
             if (argc == 0) {
-                printf("Commands:\n");
-                printf("regs:      Print registers\n");
-                printf("mem:       Print a specified range of bytes from memory\n");
-                printf("instr:     Print the next instruction to be executed\n");
-                printf("lastinstr: Print the last instruction that was executed\n");
-                printf("advance:   Advance the program counter and execute next instruction\n");
-                cout << "a:         Alias of advance\n";
-                cout << "print x:   Print a specified string or expression (see 'help expressions')\n";
+                std::cout << "Commands:\n";
+                std::cout << "regs:      Print registers\n";
+                std::cout << "mem:       Print a specified range of bytes from memory\n";
+                std::cout << "instr:     Print the next instruction to be executed\n";
+                std::cout << "lastinstr: Print the last instruction that was executed\n";
+                std::cout << "advance:   Advance the program counter and execute next instruction\n";
+                std::cout << "a:         Alias of advance\n";
+                std::cout << "print x:   Print a specified string or expression (see 'help expressions')\n";
             } else {
                 if (args[0] == "expressions") {
-                    cout << "WIP\n";
+                    std::cout << "WIP\n";
                 }
             }
         } else {
-            cout << "Unknown command '" << command << "'\nTry 'help' for help.\n";
+           std:: cout << "Unknown command '" << command << "'\nTry 'help' for help.\n";
         }
     }
 }

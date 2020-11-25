@@ -34,7 +34,7 @@ void sf(reg_t flag) {
 }
 
 void rf(reg_t flag) {
-    REGS[F] &= !(0x1 << flag);
+    REGS[F] &= ~(0x1 << flag);
 }
 
 bool gf(reg_t flag) {

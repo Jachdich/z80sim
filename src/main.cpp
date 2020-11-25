@@ -1,6 +1,5 @@
-#include <stdio.h>
 #include <fstream>
-#include <string.h>
+#include <string>
 #include <iostream>
 #include <unistd.h>
 #include <sstream>
@@ -83,6 +82,7 @@ void execute(reg_t instr) {
         
     } else if (instr == 0xED) {
         reg_t ninstr = mem[++pc];
+        //std::cout << "NEW INSTR : 0x" << std::hex << (int)ninstr << "\n";
         if (ninstr == 0xA0) { //LDI
             mem[getReg16(0b01)] = mem[getReg16(0b10)];
             setReg16(0b01, getReg16(0b01) + 1);
@@ -144,14 +144,21 @@ void execute(reg_t instr) {
             reg_t highByte = mem[nn + 1];
             setReg16((ninstr & 0b00110000) >> 4, highByte << 8 | lowByte);
             
-        } else if ((ninstr & 0b11001111) == 0b01000011) { //LD (nn), (dd)
+        } else if ((ninstr & 0b11001111) == 0b01000011) { //LD (nn), dd
             reg_t lowNN = mem[++pc];
             reg16_t nn = mem[++pc] << 8 | lowNN;
             reg16_t reg = getReg16((ninstr & 0b00110000) >> 4);
             mem[nn] = reg & 0xFF;
             mem[nn + 1] = reg >> 8;
         }
-            
+
+    } else if (instr == 0x22) { //LD (**), hl
+        reg_t lowNN = mem[++pc];
+        reg16_t nn = mem[++pc] << 8 | lowNN;
+        reg16_t reg = getReg16(0b10);
+        mem[nn] = reg & 0xFF;
+        mem[nn + 1] = reg >> 8;
+        
     } else if (instr == 0xC3) { //JP nn
         reg_t lowByte = mem[++pc];
         pc = (mem[pc + 1] << 8) | lowByte;
@@ -398,8 +405,8 @@ int run() {
 }
 
 int main(int argc, char ** argv) {
-    char * fname = parseArgs(argc, argv);
-    if (fname == NULL) {
+    std::string fname = parseArgs(argc, argv);
+    if (fname == "") {
         return 1;
     }
     if (readFile(fname) != 0) {
