@@ -1,14 +1,34 @@
 #ifndef __MAIN_H
 #define __MAIN_H
 #include "regs.h"
+#include <stdint.h>
 
-extern reg_t mem[65536];
+#define bool uint8_t
+#define true 1
+#define false 0
 
-extern reg_t lastInstr;
+typedef struct {
+    //actual CPU implementation
+    uint8_t mem[65536];
+    uint8_t regs[9];
+    uint8_t regs_[9];
 
-extern bool halt;
-extern bool debug;
-extern bool step;
+    uint8_t reg_i;
+    uint8_t reg_r;
 
-extern std::string eachTimeCommand;
+    uint16_t idxregs[2];
+
+    uint16_t pc;
+    uint16_t sp;
+
+    uint16_t pc_;
+    uint16_t sp_;
+
+    //debug & implementation
+    uint8_t lastInstr;
+    char *eachTimeCommand;
+    bool halt;
+    bool debug;
+    bool step;
+} CPU;
 #endif

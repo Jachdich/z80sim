@@ -1,13 +1,13 @@
-SOURCES := $(shell find src -type f -name *.cpp)
+SOURCES := $(shell find src -type f -name *.c)
 HEADERS := $(shell find include -type f -name *.h)
-OBJECTS := $(patsubst src/%,obj/%,$(SOURCES:.cpp=.o))
+OBJECTS := $(patsubst src/%,obj/%,$(SOURCES:.c=.o))
 
 z80sim: $(OBJECTS)
-	g++ $(OBJECTS) -o $@
+	gcc $(OBJECTS) -o $@
 
-obj/%.o: src/%.cpp $(HEADERS)
+obj/%.o: src/%.c $(HEADERS)
 	@mkdir -p obj
-	g++ -c -o $@ $< -Wall -Werror -g -ggdb -Iinclude
+	gcc -c -o $@ $< -Wall -Werror -g -ggdb -Iinclude
 
 clean:
 	rm obj/*.o

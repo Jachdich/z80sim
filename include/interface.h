@@ -1,8 +1,9 @@
 #ifndef __INTERFACE_H
 #define __INTERFACE_H
-void stepPrompt();
-void executeDebugCommand(std::string total);
-int readFile(std::string fname);
-void usage(std::string name);
-std::string parseArgs(int argc, char ** argv);
+#include "../include/main.h"
+void stepPrompt(CPU *cpu);
+void executeDebugCommand(char *total, CPU *cpu);
+int readFile(char *fname, CPU *cpu);
+void usage(char *name);
+char *parseArgs(int argc, char ** argv, CPU *cpu);
 #endif

@@ -1,9 +1,7 @@
 #ifndef __REGS_H
 #define __REGS_H
-
-typedef unsigned char reg_t;
-typedef unsigned short reg16_t;
-typedef signed char reg_signed_t;
+#include "main.h"
+#include <stdint.h>
 
 #define CARRY_FLAG 0
 #define ADD_SUB_FLAG 1
@@ -24,26 +22,13 @@ typedef signed char reg_signed_t;
 #define IX 0
 #define IY 1
 
-extern reg_t REGS[9];
-extern reg_t REGS_[9];
+void sf(uint8_t flag, CPU *cpu);
+void rf(uint8_t flag, CPU *cpu);
+bool gf(uint8_t flag, CPU *cpu);
 
-extern reg_t reg_i;
-extern reg_t reg_r;
-
-extern reg16_t IDXREGS[2];
-
-extern reg16_t pc;
-extern reg16_t sp;
-
-extern reg16_t pc_;
-extern reg16_t sp_;
-
-void sf(reg_t flag);
-void rf(reg_t flag);
-void print_regs();
-reg16_t getReg16(reg_t num);
-void setReg16(reg_t num, reg16_t value);
-bool getCondition(reg_t num);
-bool gf(reg_t flag);
+void printRegs(CPU *cpu);
+uint16_t getReg16(uint8_t num, CPU *cpu);
+void setReg16(uint8_t num, uint16_t value, CPU *cpu);
+bool getCondition(uint8_t num, CPU *cpu);
 
 #endif
